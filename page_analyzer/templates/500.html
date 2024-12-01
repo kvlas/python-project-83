@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+    <main class="flex-grow-1">
+        <div class="container-lg mt-3">
+            <h1>Кажется, что-то пошло не так</h1>
+            <p>При обработке запроса произошла непредвиденная ошибка на сервере. Попробуйте повторить запрос позднее.</p>
+            <p><a href="{{ url_for('main_page') }}">Вернуться на главную</a></p>
+        </div>
+    </main>
+
+{% endblock %}
