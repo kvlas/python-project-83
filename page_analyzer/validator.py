@@ -28,7 +28,7 @@ def get_normalized_url(url):
 
 def get_validation_errors(url):
     scheme, netloc = get_url_parts(url)
-    valid_netloc = re.match(r"[a-zA-Z-]+\.[a-zA-Z]+", netloc)
+    valid_netloc = re.match(r"[a-zA-Z0-9-]+\.[a-zA-Z]+", netloc)
 
     try:
         if scheme not in {'http', 'https'} or not valid_netloc:

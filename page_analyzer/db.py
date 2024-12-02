@@ -2,20 +2,19 @@ from psycopg2.extras import NamedTupleCursor
 import psycopg2
 
 
-
 def connect(app):
     db_url = app.config['DATABASE_URL']
-    return psycopg2.connect('postgresql://analyzer:analyzer@127.0.0.1:5432/analyzer')
+    return psycopg2.connect(db_url)
 
 
-def get_data(id, connection):
+def get_data_from_id(id, connection):
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("SELECT * FROM urls WHERE id = %s;", (id,))
         data = cursor.fetchone()
     return data
 
 
-def get_urls(connection):
+def get_urls_from_db(connection):
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("SELECT MAX(url_checks.created_at) AS created_at, "
                        "urls.id, urls.name, url_checks.status_code "
@@ -28,17 +27,17 @@ def get_urls(connection):
     return urls
 
 
-def get_url(id, connection):
+def get_url_from_db(id, connection):
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("SELECT * FROM url_checks WHERE url_id = %s "
                        "ORDER BY created_at DESC;", (id,))
         checks = cursor.fetchall()
 
-    data = get_data(id, connection)
+    data = get_data_from_id(id, connection)
     return data, checks
 
 
-def add_url_check(id, date, data, connection):
+def add_url_check_to_db(id, date, data, connection):
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("INSERT INTO url_checks "
                        "(url_id, status_code, h1, title, "
@@ -53,7 +52,7 @@ def add_url_check(id, date, data, connection):
         connection.commit()
 
 
-def add_url(url, date, connection):
+def add_url_to_db(url, date, connection):
     with connection.cursor() as cursor:
         try:
             cursor.execute("INSERT INTO urls (name, created_at) "
