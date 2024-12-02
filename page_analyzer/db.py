@@ -5,7 +5,7 @@ import psycopg2
 
 def connect(app):
     db_url = app.config['DATABASE_URL']
-    return psycopg2.connect(db_url)
+    return psycopg2.connect('postgresql://analyzer:analyzer@127.0.0.1:5432/analyzer')
 
 
 def get_data(id, connection):

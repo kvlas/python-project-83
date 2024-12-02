@@ -1,6 +1,9 @@
 import os
 import datetime
 
+
+from page_analyzer.validator import get_validation_errors, get_normalized_url
+from page_analyzer.parser import get_response, get_parse_data
 import page_analyzer.db
 from flask import Flask, render_template, request, redirect, flash, get_flashed_messages, url_for, abort
 from dotenv import load_dotenv
@@ -37,7 +40,7 @@ def urls_list():
 @app.post('/urls')
 def add_url():
     url = request.form.get('url')
-    errors = page_analyzer.db.get_validation_errors(url)
+    errors = get_validation_errors(url)
 
     if errors:
         return render_template(
@@ -45,7 +48,7 @@ def add_url():
             errors=errors
         ), 422
 
-    url = page_analyzer.db.get_normalized_url(url)
+    url = get_normalized_url(url)
     conn = page_analyzer.db.connect(app)
     date = datetime.datetime.now()
 
@@ -78,14 +81,18 @@ def url_page(id):
 @app.post('/urls/<int:id>/checks')
 def check(id):
     conn = page_analyzer.db.connect(app)
-    url = page_analyzer.db.get_data_from_id(id, conn).name
-    response = page_analyzer.db.get_response(url)
-
+    url = page_analyzer.db.get_data(id, conn).name
+    print("678")
+    response = get_response(url)
+    print("А сюда?")
     if response:
-        data = page_analyzer.db.get_parse_data(response)
+        data = get_parse_data(response)
         date = datetime.datetime.now()
-
+         
+        print("СЮДА ДОШЛИ")
+         
         page_analyzer.db.add_url_check(id, date, data, conn)
+        print(" А СЮДА НЕТ")
         flash('Страница успешно проверена', 'success')
     else:
         flash('Произошла ошибка при проверке', 'danger')
