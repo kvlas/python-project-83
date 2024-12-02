@@ -17,36 +17,38 @@ class ValidationError(Exception):
 
 
 def check_url(url):
+    if not urlparse(url).scheme:
+        url = f'http://{url}'
     parsed_url = urlparse(url)
-    scheme = parsed_url.scheme or 'http'
-    netloc = parsed_url.netloc or parsed_url.path
-    return f'{scheme}://{netloc}'
+    netloc = parsed_url.netloc
+    return f'{parsed_url.scheme}://{netloc}'
+
 
 def check_errors(url):
+    messages = []
+
     if not url:
-        flash('URL обязателен', 'danger')
-        return get_flashed_messages(with_categories=True)
+        messages.append(('danger', 'URL обязателен'))
 
     if len(url) > MAX_LENGTH:
-        flash(f'URL превышает {MAX_LENGTH} символов', 'danger')
-        return get_flashed_messages(with_categories=True)
+        messages.append(('danger', f'URL превышает {MAX_LENGTH} символов'))
+
+    if not urlparse(url).scheme:
+        url = f'http://{url}'
 
     parsed_url = urlparse(url)
-    
+
     if parsed_url.scheme not in ('http', 'https'):
-        flash('Некорректный URL', 'danger')
-        return get_flashed_messages(with_categories=True)
-    
+        messages.append(('danger', 'Некорректный URL'))
+
     if not parsed_url.netloc:
-        flash('Некорректный URL', 'danger')
-        return get_flashed_messages(with_categories=True)
-    
+        messages.append(('danger', 'Некорректный URL'))
+
     try:
         netloc_idna = parsed_url.netloc.encode('idna').decode('ascii')
     except UnicodeError:
-        flash('Некорректный URL', 'danger')
-        return get_flashed_messages(with_categories=True)
-    
+        messages.append(('danger', 'Некорректный URL'))
+
     netloc_regex = re.compile(
         r'^(?:'
         r'[a-zA-Z0-9\-\.]+'
@@ -54,20 +56,15 @@ def check_errors(url):
         r'|(?:\d{1,3}(?:\.\d{1,3}){3})'
         r')(?::\d+)?$'
     )
-    
-    if not netloc_regex.match(netloc_idna):
-        flash('Некорректный URL', 'danger')
-        return get_flashed_messages(with_categories=True)
-    
-    host, sep, port = netloc_idna.partition(':')
-    if port:
-        try:
-            port_num = int(port)
-            if not (0 < port_num < 65536):
-                flash('Некорректный URL', 'danger')
-                return get_flashed_messages(with_categories=True)
-        except ValueError:
-            flash('Некорректный URL', 'danger')
-            return get_flashed_messages(with_categories=True)
 
-    return []
+    if not netloc_regex.match(netloc_idna):
+        messages.append(('danger', 'Некорректный URL'))
+
+    if parsed_url.port:
+        if not (0 < parsed_url.port < 65536):
+            messages.append(('danger', 'Некорректный URL'))
+
+    for category, msg in messages:
+        flash(msg, category)
+
+    return get_flashed_messages(with_categories=True) if messages else []
