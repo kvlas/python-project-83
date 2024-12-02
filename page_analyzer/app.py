@@ -1,14 +1,21 @@
-import os
-import datetime
-from page_analyzer.validator import check_url, check_errors
+from page_analyzer.validator import get_validation_errors, get_normalized_url
 from page_analyzer.parser import get_response, get_parse_data
-import page_analyzer.db
-from flask import Flask, render_template, request, redirect, flash, get_flashed_messages, url_for, abort
+from page_analyzer.db import (
+    add_url_to_db, get_urls_from_db, get_data_from_id,
+    get_url_from_db, add_url_check_to_db, connect,
+)
+from flask import (
+    Flask, render_template, request, redirect,
+    flash, get_flashed_messages, url_for, abort
+)
 from dotenv import load_dotenv
+import datetime
+import os
+
 
 load_dotenv()
-app = Flask(__name__)
 
+app = Flask(__name__)
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 DATABASE_URL = os.getenv('DATABASE_URL')
@@ -27,8 +34,8 @@ def main_page():
 
 @app.get('/urls')
 def urls_list():
-    conn = page_analyzer.db.connect(app)
-    urls = page_analyzer.db.get_urls(conn)
+    conn = connect(app)
+    urls = get_urls_from_db(conn)
     return render_template(
         'urls.html',
         urls=urls
@@ -38,20 +45,19 @@ def urls_list():
 @app.post('/urls')
 def add_url():
     url = request.form.get('url')
-    errors = check_errors(url)
+    errors = get_validation_errors(url)
 
     if errors:
         return render_template(
             'index.html',
-            errors=errors,
-            url=url
+            errors=errors
         ), 422
 
-    url = check_url(url)
-    conn = page_analyzer.db.connect(app)
+    url = get_normalized_url(url)
+    conn = connect(app)
     date = datetime.datetime.now()
 
-    is_added, id = page_analyzer.db.add_url(url, date, conn)
+    is_added, id = add_url_to_db(url, date, conn)
 
     if is_added:
         flash('Страница успешно добавлена', 'success')
@@ -63,8 +69,8 @@ def add_url():
 
 @app.get('/urls/<int:id>')
 def url_page(id):
-    conn = page_analyzer.db.connect(app)
-    data, checks = page_analyzer.db.get_url(id, conn)
+    conn = connect(app)
+    data, checks = get_url_from_db(id, conn)
     if not data:
         return abort(404)
 
@@ -79,14 +85,15 @@ def url_page(id):
 
 @app.post('/urls/<int:id>/checks')
 def check(id):
-    conn = page_analyzer.db.connect(app)
-    url = page_analyzer.db.get_data(id, conn).name
+    conn = connect(app)
+    url = get_data_from_id(id, conn).name
     response = get_response(url)
+
     if response:
         data = get_parse_data(response)
         date = datetime.datetime.now()
-        page_analyzer.db.add_url_check(id, date, data, conn)
 
+        add_url_check_to_db(id, date, data, conn)
         flash('Страница успешно проверена', 'success')
     else:
         flash('Произошла ошибка при проверке', 'danger')

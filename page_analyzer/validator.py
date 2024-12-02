@@ -2,7 +2,6 @@ from flask import flash, get_flashed_messages
 from urllib.parse import urlparse
 import re
 
-
 MAX_LENGTH = 255
 
 
@@ -16,55 +15,33 @@ class ValidationError(Exception):
     pass
 
 
-def check_url(url):
-    if not urlparse(url).scheme:
-        url = f'http://{url}'
-    parsed_url = urlparse(url)
-    netloc = parsed_url.netloc
-    return f'{parsed_url.scheme}://{netloc}'
+def get_url_parts(url):
+    parse_url = urlparse(url)
+    scheme, netloc = parse_url.scheme, parse_url.netloc
+    return scheme, netloc
 
 
-def check_errors(url):
-    messages = []
+def get_normalized_url(url):
+    scheme, netloc = get_url_parts(url)
+    return f'{scheme}://{netloc}'
 
-    if not url:
-        messages.append(('danger', 'URL обязателен'))
 
-    if len(url) > MAX_LENGTH:
-        messages.append(('danger', f'URL превышает {MAX_LENGTH} символов'))
-
-    if not urlparse(url).scheme:
-        url = f'http://{url}'
-
-    parsed_url = urlparse(url)
-
-    if parsed_url.scheme not in ('http', 'https'):
-        messages.append(('danger', 'Некорректный URL'))
-
-    if not parsed_url.netloc:
-        messages.append(('danger', 'Некорректный URL'))
+def get_validation_errors(url):
+    scheme, netloc = get_url_parts(url)
+    valid_netloc = re.match(r"[a-zA-Z-]+\.[a-zA-Z]+", netloc)
 
     try:
-        netloc_idna = parsed_url.netloc.encode('idna').decode('ascii')
-    except UnicodeError:
-        messages.append(('danger', 'Некорректный URL'))
+        if scheme not in {'http', 'https'} or not valid_netloc:
+            raise ValidationError
+        if len(url) > MAX_LENGTH:
+            raise MaxLengthError
 
-    netloc_regex = re.compile(
-        r'^(?:'
-        r'[a-zA-Z0-9\-\.]+'
-        r'|(?:\[[0-9a-fA-F:]+\])'
-        r'|(?:\d{1,3}(?:\.\d{1,3}){3})'
-        r')(?::\d+)?$'
-    )
+    except ValidationError:
+        flash('Некорректный URL', 'danger')
+        if not url:
+            flash('URL обязателен', 'danger')
 
-    if not netloc_regex.match(netloc_idna):
-        messages.append(('danger', 'Некорректный URL'))
+    except MaxLengthError:
+        flash(f'URL превышает {MAX_LENGTH} символов', 'danger')
 
-    if parsed_url.port:
-        if not (0 < parsed_url.port < 65536):
-            messages.append(('danger', 'Некорректный URL'))
-
-    for category, msg in messages:
-        flash(msg, category)
-
-    return get_flashed_messages(with_categories=True) if messages else []
+    return get_flashed_messages(with_categories=True)
