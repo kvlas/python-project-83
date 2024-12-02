@@ -1,8 +1,4 @@
-# Makefile
-lint: #project linter check
-	poetry run flake8 genpage_analyzer
-
-install: # deps install
+install:
 	poetry install
 
 dev:
@@ -12,15 +8,11 @@ PORT ?= 8000
 start:
 	poetry run gunicorn -w 5 -b 0.0.0.0:$(PORT) page_analyzer:app
 
-build: # Build project
-	rm -f ./dist/*
-	poetry build
+lint:
+	poetry run flake8 page_analyzer
 
-publish: # Publish package
-	poetry publish --dry-run
-
-package-install: # Install package
-	python3 -m pip install --user dist/*.whl
+test:
+	poetry run pytest
 
 test-coverage:
 	poetry run pytest --cov=page_analyzer --cov-report xml
