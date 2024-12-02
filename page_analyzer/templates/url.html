@@ -18,16 +18,16 @@
                 <table class="table table-bordered table-hover text-nowrap" data-test="url">
                     <tbody>
                         <tr>
-                            <td>ID</td>
-                            <td>{{ data.id }}</td>
+                          <td>ID</td>
+                          <td>{{ data.id }}</td>
                         </tr>
                         <tr>
-                            <td>Имя</td>
-                            <td>{{ data.name }}</td>
+                          <td>Имя</td>
+                          <td>{{ data.name }}</td>
                         </tr>
                         <tr>
-                            <td>Дата создания</td>
-                            <td>{{ data.created_at.strftime('%Y-%m-%d') }}</td>
+                          <td>Дата создания</td>
+                          <td>{{ data.created_at.strftime('%Y-%m-%d') }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -35,38 +35,31 @@
 
             <h2 class="mt-5 mb-3">Проверки</h2>
             <form method="post" action="{{ url_for('check', id=data.id) }}">
-                {{ csrf_token() }}
-                <input type="submit" class="btn btn-primary" value="Запустить проверку">
+            <input type="submit" class="btn btn-primary" value="Запустить проверку">
             </form>
 
             <div>
                 <table class="table table-bordered table-hover mt-2" data-test="checks">
-                    <thead>
-                        <tr>
-                            <th scope="col">ID</th>
-                            <th scope="col">Код ответа</th>
-                            <th scope="col">h1</th>
-                            <th scope="col">title</th>
-                            <th scope="col">description</th>
-                            <th scope="col">Дата создания</th>
-                        </tr>
-                    </thead>
                     <tbody>
+                        <tr>
+                            <th>ID</th>
+                            <th>Код ответа</th>
+                            <th>h1</th>
+                            <th>title</th>
+                            <th>description</th>
+                            <th>Дата создания</th>
+                        </tr>
                         {% if checks %}
                             {% for check in checks %}
                                 <tr>
                                     <td>{{ check.id }}</td>
                                     <td>{{ check.status_code }}</td>
-                                    <td>{{ check.h1 or '' }}</td>
-                                    <td>{{ check.title or '' }}</td>
-                                    <td>{{ check.description or '' }}</td>
+                                    <td>{% if check.h1 %}{{ check.h1 }}{% endif %}</td>
+                                    <td>{% if check.title %}{{ check.title }}{% endif %}</td>
+                                    <td>{% if check.description %}{{ check.description }}{% endif %}</td>
                                     <td>{{ check.created_at.strftime('%Y-%m-%d') }}</td>
                                 </tr>
                             {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="6" class="text-center">Проверки не найдены.</td>
-                            </tr>
                         {% endif %}
                     </tbody>
                 </table>
