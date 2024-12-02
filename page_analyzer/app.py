@@ -43,7 +43,8 @@ def add_url():
     if errors:
         return render_template(
             'index.html',
-            errors=errors
+            errors=errors,
+            url=url
         ), 422
 
     url = check_url(url)
