@@ -1,6 +1,11 @@
-from page_analyzer.validator import MAX_LENGTH
-from bs4 import BeautifulSoup
+# Standard library imports
 import requests
+
+# Third-party imports
+from bs4 import BeautifulSoup
+
+# Local application imports
+from page_analyzer.validator import MAX_LENGTH
 
 
 HIDE_CHARS = '...'

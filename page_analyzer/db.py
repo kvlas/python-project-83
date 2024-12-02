@@ -1,5 +1,6 @@
-from psycopg2.extras import NamedTupleCursor
+# Third-party imports
 import psycopg2
+from psycopg2.extras import NamedTupleCursor
 
 
 def connect(app):

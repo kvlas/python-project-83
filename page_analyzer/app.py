@@ -1,16 +1,21 @@
+# Standard library imports
+import datetime
+import os
+
+# Third-party imports
+from flask import (
+    Flask, render_template, request, redirect,
+    flash, get_flashed_messages, url_for, abort
+)
+from dotenv import load_dotenv
+
+# Local application imports
 from page_analyzer.validator import get_validation_errors, get_normalized_url
 from page_analyzer.parser import get_response, get_parse_data
 from page_analyzer.db import (
     add_url_to_db, get_urls_from_db, get_data_from_id,
     get_url_from_db, add_url_check_to_db, connect,
 )
-from flask import (
-    Flask, render_template, request, redirect,
-    flash, get_flashed_messages, url_for, abort
-)
-from dotenv import load_dotenv
-import datetime
-import os
 
 
 load_dotenv()

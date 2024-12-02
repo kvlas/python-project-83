@@ -1,6 +1,10 @@
-from flask import flash, get_flashed_messages
-from urllib.parse import urlparse
+# Standard library imports
 import re
+
+# Third-party imports
+from urllib.parse import urlparse
+from flask import flash, get_flashed_messages
+
 
 MAX_LENGTH = 255
 

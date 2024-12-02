@@ -3,7 +3,7 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/f33ce5c5d2ef423b9cdb/maintainability)](https://codeclimate.com/github/kvlas/python-project-83/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/f33ce5c5d2ef423b9cdb/test_coverage)](https://codeclimate.com/github/kvlas/python-project-83/test_coverage)
 
-Page Analyzer - app for analizing site pages for SEO-suitability. Before running app check description below.
+Page Analyzer - app analizing site for SEO-suitability. Before running app check description below.
 
 ### Requirements
 
