@@ -1,6 +1,7 @@
 import psycopg2
 from psycopg2.extras import NamedTupleCursor
 
+
 def connect(db_url):
     return psycopg2.connect(db_url)
 
