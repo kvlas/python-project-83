@@ -24,7 +24,7 @@ from page_analyzer.db import (
     get_url_from_db,
     get_urls_from_db,
 )
-from page_analyzer.parser import get_parse_data, get_response
+from page_analyzer.html import get_parse_data, get_response
 
 # Local application imports
 from page_analyzer.validator import get_normalized_url, get_validation_errors

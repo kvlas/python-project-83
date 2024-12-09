@@ -2,7 +2,7 @@
 import re
 
 # Third-party imports
-from urllib.parse import urlparse
+from urllib.html import urlparse
 
 from flask import flash, get_flashed_messages
 
