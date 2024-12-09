@@ -1,5 +1,6 @@
 import datetime
 import os
+
 from dotenv import load_dotenv
 from flask import (
     Flask,
@@ -11,6 +12,7 @@ from flask import (
     request,
     url_for,
 )
+
 from page_analyzer.db import (
     add_url_check_to_db,
     add_url_to_db,

@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
-from page_analyzer.validator import MAX_LENGTH
 
+from page_analyzer.validator import MAX_LENGTH
 
 HIDE_CHARS = '...'
 
