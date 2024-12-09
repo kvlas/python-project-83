@@ -1,10 +1,6 @@
-# Standard library imports
 import datetime
 import os
-
 from dotenv import load_dotenv
-
-# Third-party imports
 from flask import (
     Flask,
     abort,
@@ -15,7 +11,6 @@ from flask import (
     request,
     url_for,
 )
-
 from page_analyzer.db import (
     add_url_check_to_db,
     add_url_to_db,
@@ -25,8 +20,6 @@ from page_analyzer.db import (
     get_urls_from_db,
 )
 from page_analyzer.html import get_parse_data, get_response
-
-# Local application imports
 from page_analyzer.validator import get_normalized_url, get_validation_errors
 
 load_dotenv()
