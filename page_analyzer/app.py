@@ -45,8 +45,7 @@ def main_page():
 
 @app.get('/urls')
 def urls_list():
-    conn = connect(app)
-    urls = get_urls_from_db(conn)
+    urls = get_urls_from_db(app.config['DATABASE_URL'])
     return render_template(
         'urls.html',
         urls=urls
@@ -57,18 +56,12 @@ def urls_list():
 def add_url():
     url = request.form.get('url')
     errors = get_validation_errors(url)
-
     if errors:
-        return render_template(
-            'index.html',
-            errors=errors
-        ), 422
+        return render_template('index.html', errors=errors), 422
 
     url = get_normalized_url(url)
-    conn = connect(app)
     date = datetime.datetime.now()
-
-    is_added, id = add_url_to_db(url, date, conn)
+    is_added, id = add_url_to_db(app.config['DATABASE_URL'], url, date)
 
     if is_added:
         flash('Страница успешно добавлена', 'success')
@@ -80,8 +73,7 @@ def add_url():
 
 @app.get('/urls/<int:id>')
 def url_page(id):
-    conn = connect(app)
-    data, checks = get_url_from_db(id, conn)
+    data, checks = get_url_from_db(app.config['DATABASE_URL'], id)
     if not data:
         return abort(404)
 
@@ -96,15 +88,19 @@ def url_page(id):
 
 @app.post('/urls/<int:id>/checks')
 def check(id):
-    conn = connect(app)
-    url = get_data_from_id(id, conn).name
+    url_data = get_data_from_id(app.config['DATABASE_URL'], id)
+    if not url_data:
+        flash('URL не найден', 'danger')
+        return redirect(url_for('urls_list'))
+
+    url = url_data.name
     response = get_response(url)
 
     if response:
         data = get_parse_data(response)
         date = datetime.datetime.now()
 
-        add_url_check_to_db(id, date, data, conn)
+        add_url_check_to_db(app.config['DATABASE_URL'], id, date, data)
         flash('Страница успешно проверена', 'success')
     else:
         flash('Произошла ошибка при проверке', 'danger')
