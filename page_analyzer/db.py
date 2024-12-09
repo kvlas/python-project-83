@@ -5,12 +5,14 @@ from psycopg2.extras import NamedTupleCursor
 def connect(db_url):
     return psycopg2.connect(db_url)
 
+
 def get_data_from_id(db_url, id):
     with connect(db_url) as connection:
         with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
             cursor.execute("SELECT * FROM urls WHERE id = %s;", (id,))
             data = cursor.fetchone()
     return data
+
 
 def get_urls_from_db(db_url):
     with connect(db_url) as connection:
@@ -24,6 +26,7 @@ def get_urls_from_db(db_url):
             urls = cursor.fetchall()
     return urls
 
+
 def get_url_from_db(db_url, id):
     with connect(db_url) as connection:
         with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
@@ -33,6 +36,7 @@ def get_url_from_db(db_url, id):
         
         data = get_data_from_id(db_url, id)
     return data, checks
+
 
 def add_url_check_to_db(db_url, id, date, data):
     with connect(db_url) as connection:
@@ -48,6 +52,7 @@ def add_url_check_to_db(db_url, id, date, data):
                             'description': data['description'],
                             'created_at': date})
             connection.commit()
+
 
 def add_url_to_db(db_url, url, date):
     with connect(db_url) as connection:

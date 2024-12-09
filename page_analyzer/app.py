@@ -16,7 +16,6 @@ from flask import (
 from page_analyzer.db import (
     add_url_check_to_db,
     add_url_to_db,
-    connect,
     get_data_from_id,
     get_url_from_db,
     get_urls_from_db,
